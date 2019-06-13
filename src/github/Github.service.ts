@@ -2,8 +2,9 @@ import * as rp from 'request-promise';
 import * as shell from 'shelljs';
 
 import { AppConfig } from '../config/App.config';
+import { IGithubRepoFilterProperties } from '../interface/Github.interface';
 
-class Github {
+export class GithubService {
     public getRepos = async () => {
         const options = {
             uri: 'https://api.github.com/user/repos',
@@ -17,7 +18,16 @@ class Github {
             json: true
         };
         const repos = await rp(options);
-        return repos;
+
+        const filterRepos: IGithubRepoFilterProperties[] = repos.map((repo: any )=> {
+                                                            return {
+                                                                name: repo.name,
+                                                                private: repo.private,
+                                                                html_url: repo.html_url,
+                                                                clone_url: repo.clone_url
+                                                            }
+                                                        });
+        return filterRepos;
     }
 
     public cloneRepos = async (repos: string[]) => {
