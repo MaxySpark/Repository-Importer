@@ -1,10 +1,11 @@
 import * as rp from 'request-promise';
-import * as shell from 'shelljs';
+import * as parse from 'parse-link-header';
 
 import { AppConfig } from '../config/App.config';
-import { IGithubRepoFilterProperties } from '../interface/Github.interface';
+import { IGithubRepoFilterProperties, IPagination } from '../interface/Github.interface';
 
 export class GithubService {
+
     public getRepos = async () => {
         const options = {
             uri: 'https://api.github.com/user/repos',
@@ -12,14 +13,17 @@ export class GithubService {
                 'Authorization': 'token ' + AppConfig.PERSONAL_ACCESS_TOKEN,
                 'User-Agent': 'nodejs'
             },
+            resolveWithFullResponse: true,
             body: {
                 visibility: 'private'
             },
             json: true
         };
-        const repos = await rp(options);
+        const { headers, body } = await rp(options);
 
-        const filterRepos: IGithubRepoFilterProperties[] = repos.map((repo: any )=> {
+        const link: IPagination = parse(headers.link);
+
+        const filterRepos: IGithubRepoFilterProperties[] = body.map((repo: any )=> {
                                                             return {
                                                                 name: repo.name,
                                                                 private: repo.private,
@@ -27,16 +31,7 @@ export class GithubService {
                                                                 clone_url: repo.clone_url
                                                             }
                                                         });
-        return filterRepos;
+        return { repos: filterRepos, link: link};
     }
 
-    public cloneRepos = async (repos: string[]) => {
-        shell.cd(__dirname + '/../../git');
-
-        repos.forEach( async (repo) => {
-            const {stderr, code} = shell.exec(`git clone ${repo}`, { silent: true });
-            console.log(code);
-        });
-        
-    }
 }
