@@ -13,13 +13,12 @@ export class SharedService {
         
         shell.cd(__dirname + '/../../git');
 
-        
         const spinner = ora({
             text: `Cloning Repositories\n`,
         }).start();
 
         const bar = new progress.Bar({}, progress.Presets.shades_classic);
-        let count = 1;
+        let count = 0;
         bar.start(repos.length, count);
         
         repos.forEach( async (repo) => {

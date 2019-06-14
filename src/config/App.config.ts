@@ -1,3 +1,4 @@
 export const AppConfig = {
-    PERSONAL_ACCESS_TOKEN : process.env.PERSONAL_ACCESS_TOKEN
+    GITHUB_USERNAME : process.env.GITHUB_USERNAME,
+    GITHUB_PASSWORD : process.env.GITHUB_PASSWORD
 };

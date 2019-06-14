@@ -23,23 +23,32 @@ export class App {
     };
 
     public getRepos = async (provider: 'github' | 'bitbucket') => {
-        let githubResponse : {
-            repos: IGithubRepoFilterProperties[];
-            link: IPagination;
-        };
-
         const spinner = ora({
             text: 'Fetching Repositories\n',
         }).start();
 
-        if (provider === 'github') {
-            githubResponse = await this.githubService.getRepos();
+        try {
+
+            let githubResponse : {
+                repos: IGithubRepoFilterProperties[];
+                link: IPagination;
+            };
+    
+            if (provider === 'github') {
+                githubResponse = await this.githubService.getRepos();
+            }
+    
+            spinner.text = 'Repositories Fetched Successfully\n';
+            spinner.succeed();
+    
+            return githubResponse;
+
+        } catch(e) {
+            
+            spinner.stop();
+            throw new Error(e);
         }
-
-        spinner.text = 'Repositories Fetched Successfully\n';
-        spinner.succeed();
-
-        return githubResponse;
+        
     };
 
     public selectRepos = async (repos: IGithubRepoFilterProperties[]) => {

@@ -9,8 +9,11 @@ export class GithubService {
     public getRepos = async () => {
         const options = {
             uri: 'https://api.github.com/user/repos',
+            auth: {
+                user: AppConfig.GITHUB_USERNAME,
+                pass: AppConfig.GITHUB_PASSWORD
+            },
             headers: {
-                'Authorization': 'token ' + AppConfig.PERSONAL_ACCESS_TOKEN,
                 'User-Agent': 'nodejs'
             },
             resolveWithFullResponse: true,
@@ -19,8 +22,13 @@ export class GithubService {
             },
             json: true
         };
+        
         const { headers, body } = await rp(options);
-
+        
+        if (headers.status === 401 || headers.status === 403 || headers.status === 404) {
+            throw new Error(body.message);
+        }
+        
         const link: IPagination = parse(headers.link);
 
         const filterRepos: IGithubRepoFilterProperties[] = body.map((repo: any )=> {
