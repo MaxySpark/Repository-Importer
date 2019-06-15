@@ -6,9 +6,9 @@ import { IGithubRepoFilterProperties, IPagination } from '../interface/Github.in
 
 export class GithubService {
 
-    public getRepos = async () => {
+    public getRepos = async (url: string = 'https://api.github.com/user/repos') => {
         const options = {
-            uri: 'https://api.github.com/user/repos',
+            uri: url,
             auth: {
                 user: AppConfig.GITHUB_USERNAME,
                 pass: AppConfig.GITHUB_PASSWORD
@@ -34,12 +34,16 @@ export class GithubService {
         const filterRepos: IGithubRepoFilterProperties[] = body.map((repo: any )=> {
                                                             return {
                                                                 name: repo.name,
+                                                                owner: {
+                                                                    login: repo.owner.login,
+                                                                    type: repo.owner.type
+                                                                },
                                                                 private: repo.private,
                                                                 html_url: repo.html_url,
                                                                 clone_url: repo.clone_url
                                                             }
                                                         });
-        return { repos: filterRepos, link: link};
+        return { repos: filterRepos, link: link, provider: 'github'};
     }
 
 }

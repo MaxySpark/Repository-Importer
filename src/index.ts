@@ -9,13 +9,34 @@ import { SharedService } from './shared/Shared.service';
         
         const provider = await app.selectProvider();
         
-        const repositoryObject = await app.getRepos(provider);
+        let repositoryObject = await app.getRepos(provider);
         
-        const selectedRepos: string[] = await app.selectRepos(repositoryObject.repos);
+        let selectedRepos: string[] = await app.selectRepos(repositoryObject.repos);
 
-        await sharedService.cloneRepos(selectedRepos);
+        if (selectedRepos && selectedRepos.length !== 0) {
+            await sharedService.cloneRepos(selectedRepos);
+        }
+        
+        let repeat = true;
 
-        console.log(repositoryObject.link);
+        while (repeat) {
+            repeat = await app.isRepeat();
+            
+            if (repeat) {
+                repositoryObject = await app.fetchMoreRepos(provider, repositoryObject);
+
+                selectedRepos = await app.selectRepos(repositoryObject.repos);
+
+                if (selectedRepos && selectedRepos.length !== 0) {
+                    await sharedService.cloneRepos(selectedRepos);
+                }
+            }
+
+        }
+        
+        
+
+        
     } catch(e) {
         console.log(e.message);
     }
