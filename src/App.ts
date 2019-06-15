@@ -2,10 +2,12 @@ import * as prompts from 'prompts';
 import * as ora from 'ora';
 
 import { GithubService } from './github/Github.service';
-import { IGithubRepoFilterProperties, IPagination, IGithubRepoResponse } from './interface/Github.interface';
+import { BitbucketService } from './bitbucket/Bitbucket.service';
+import { IRepoResponse, IRepoFilterProperties } from './interface';
 
 export class App {
     private githubService = new GithubService();
+    private bitbucketService = new BitbucketService();
 
     public selectProvider = async () => {
         const provider = await prompts({
@@ -29,16 +31,18 @@ export class App {
 
         try {
 
-            let githubResponse : IGithubRepoResponse;
+            let response : IRepoResponse;
     
             if (provider === 'github') {
-                githubResponse = await this.githubService.getRepos();
+                response = await this.githubService.getRepos();
+            } else {
+                response = await this.bitbucketService.getRepos();
             }
     
             spinner.text = 'Repositories Fetched Successfully\n';
             spinner.succeed();
     
-            return githubResponse;
+            return response;
 
         } catch(e) {
             
@@ -48,7 +52,7 @@ export class App {
         
     };
 
-    public selectRepos = async (repos: IGithubRepoFilterProperties[]) => {
+    public selectRepos = async (repos: IRepoFilterProperties[]) => {
         const selectedRepos = await prompts({
             type: 'autocompleteMultiselect',
             name: 'value',
@@ -60,12 +64,12 @@ export class App {
         return selectedRepos.value;
     }
 
-    public fetchMoreRepos = async (provider: 'github' | 'bitbucket', data: IGithubRepoResponse) => {
+    public fetchMoreRepos = async (provider: 'github' | 'bitbucket', data: IRepoResponse) => {
         const link = await prompts({
             type: 'select',
             name: 'value',
             message: 'Pick a Link To Fetch More Repositories',
-            choices: Object.keys(data.link).map((key: 'prev' | 'next' | 'last') => {
+            choices: Object.keys(data.link).map((key: 'first' | 'prev' | 'next' | 'last') => {
                 return {
                     title: `${key} page`,
                     value: data.link[key].url
@@ -80,16 +84,18 @@ export class App {
 
         try {
 
-            let githubResponse : IGithubRepoResponse;
+            let response : IRepoResponse;
     
             if (provider === 'github') {
-                githubResponse = await this.githubService.getRepos(link.value);
+                response = await this.githubService.getRepos(link.value);
+            } else {
+                response = await this.bitbucketService.getRepos(link.value);
             }
     
             spinner.text = 'Repositories Fetched Successfully\n';
             spinner.succeed();
     
-            return githubResponse;
+            return response;
 
         } catch(e) {
             

@@ -1,8 +1,8 @@
-export interface IGithubRepoFilterProperties {
+export interface IRepoFilterProperties {
     name: string;
     owner: {
         login: string;
-        type: 'User' | 'Organization';
+        type: 'User' | 'Organization' | 'user' | 'team';
     };
     private: boolean;
     html_url: string;
@@ -32,8 +32,8 @@ export interface IPagination {
             };
 }
 
-export interface IGithubRepoResponse {
-    provider: string;
-    repos: IGithubRepoFilterProperties[];
+export interface IRepoResponse {
+    provider: 'github' | 'bitbucket';
+    repos: IRepoFilterProperties[];
     link: IPagination;
 }

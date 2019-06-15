@@ -20,16 +20,21 @@ import { SharedService } from './shared/Shared.service';
         let repeat = true;
 
         while (repeat) {
-            repeat = await app.isRepeat();
+
+            if (Object.keys(repositoryObject.link).length > 0) {
+                repeat = await app.isRepeat();
             
-            if (repeat) {
-                repositoryObject = await app.fetchMoreRepos(provider, repositoryObject);
-
-                selectedRepos = await app.selectRepos(repositoryObject.repos);
-
-                if (selectedRepos && selectedRepos.length !== 0) {
-                    await sharedService.cloneRepos(selectedRepos);
+                if (repeat) {
+                    repositoryObject = await app.fetchMoreRepos(provider, repositoryObject);
+    
+                    selectedRepos = await app.selectRepos(repositoryObject.repos);
+    
+                    if (selectedRepos && selectedRepos.length !== 0) {
+                        await sharedService.cloneRepos(selectedRepos);
+                    }
                 }
+            } else {
+                repeat = false;
             }
 
         }

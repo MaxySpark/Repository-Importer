@@ -1,4 +1,6 @@
 export const AppConfig = {
     GITHUB_USERNAME : process.env.GITHUB_USERNAME,
-    GITHUB_PASSWORD : process.env.GITHUB_PASSWORD
+    GITHUB_PASSWORD : process.env.GITHUB_PASSWORD,
+    BITBUCKET_USERNAME : process.env.BITBUCKET_USERNAME,
+    BITBUCKET_PASSWORD : process.env.BITBUCKET_PASSWORD
 };

@@ -2,11 +2,13 @@ import * as rp from 'request-promise';
 import * as parse from 'parse-link-header';
 
 import { AppConfig } from '../config/App.config';
-import { IGithubRepoFilterProperties, IPagination } from '../interface/Github.interface';
+import { IPagination, IRepoFilterProperties, IRepoResponse } from '../interface';
 
 export class GithubService {
+    
+    private baseUrl = 'https://api.github.com/user/repos';
 
-    public getRepos = async (url: string = 'https://api.github.com/user/repos') => {
+    public getRepos = async (url: string = this.baseUrl) => {
         const options = {
             uri: url,
             auth: {
@@ -31,7 +33,7 @@ export class GithubService {
         
         const link: IPagination = parse(headers.link);
 
-        const filterRepos: IGithubRepoFilterProperties[] = body.map((repo: any )=> {
+        const filterRepos: IRepoFilterProperties[] = body.map((repo: any )=> {
                                                             return {
                                                                 name: repo.name,
                                                                 owner: {
@@ -43,7 +45,9 @@ export class GithubService {
                                                                 clone_url: repo.clone_url
                                                             }
                                                         });
-        return { repos: filterRepos, link: link, provider: 'github'};
+
+        const response: IRepoResponse = { repos: filterRepos, link: link, provider: 'github'};
+        return response;
     }
 
 }
