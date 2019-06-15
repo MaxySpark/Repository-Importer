@@ -37,3 +37,8 @@ export interface IRepoResponse {
     repos: IRepoFilterProperties[];
     link: IPagination;
 }
+
+export interface IUser {
+    username: string;
+    password: string;
+}

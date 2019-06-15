@@ -12,7 +12,7 @@ export class BitbucketService {
             uri: url,
             auth: {
                 user: AppConfig.BITBUCKET_USERNAME,
-                pass: AppConfig.BITBUCKET_PASSWORD
+                pass: AppConfig.BITBUCKET_ACCESS_TOKEN
             },
             headers: {
                 'User-Agent': 'nodejs'

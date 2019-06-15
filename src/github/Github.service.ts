@@ -11,11 +11,8 @@ export class GithubService {
     public getRepos = async (url: string = this.baseUrl) => {
         const options = {
             uri: url,
-            auth: {
-                user: AppConfig.GITHUB_USERNAME,
-                pass: AppConfig.GITHUB_PASSWORD
-            },
             headers: {
+                'Authorization': 'token ' + AppConfig.GITHUB_ACCESS_TOKEN,
                 'User-Agent': 'nodejs'
             },
             resolveWithFullResponse: true,

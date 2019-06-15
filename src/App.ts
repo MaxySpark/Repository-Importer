@@ -3,7 +3,8 @@ import * as ora from 'ora';
 
 import { GithubService } from './github/Github.service';
 import { BitbucketService } from './bitbucket/Bitbucket.service';
-import { IRepoResponse, IRepoFilterProperties } from './interface';
+import { IRepoResponse, IRepoFilterProperties, IUser } from './interface';
+import { AppConfig } from './config/App.config';
 
 export class App {
     private githubService = new GithubService();

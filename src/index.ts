@@ -8,13 +8,17 @@ import { SharedService } from './shared/Shared.service';
         const sharedService = new SharedService();
         
         const provider = await app.selectProvider();
-        
+
+        if (!provider) {
+            return;
+        }
+
         let repositoryObject = await app.getRepos(provider);
         
         let selectedRepos: string[] = await app.selectRepos(repositoryObject.repos);
 
         if (selectedRepos && selectedRepos.length !== 0) {
-            await sharedService.cloneRepos(selectedRepos);
+            await sharedService.cloneRepos(provider, selectedRepos);
         }
         
         let repeat = true;
@@ -30,7 +34,7 @@ import { SharedService } from './shared/Shared.service';
                     selectedRepos = await app.selectRepos(repositoryObject.repos);
     
                     if (selectedRepos && selectedRepos.length !== 0) {
-                        await sharedService.cloneRepos(selectedRepos);
+                        await sharedService.cloneRepos(provider, selectedRepos);
                     }
                 }
             } else {
