@@ -125,20 +125,31 @@ export class App {
 
     public getPushRepoUrls = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
         try {
-            const spinner = ora({
-                text: `Creating Repositories\n`,
-            }).start();
+            
             const repos_w_push_url: IRepoFilterProperties[] = [];
             const push_provider = this.getPushProvider(provider);
+            
+            const service = push_provider === 'github' ? 'Github' : 'Bitbucket';
+
+            const spinner = ora({
+                text: `Creating Repositories in ${service}\n`,
+            }).start();
+
             if (push_provider === 'github') {
                 for (const repo of repos) {
                     const n_repo = await this.githubService.createRepo(repo.name);
                     repo.push_url = n_repo.clone_url;
                     repos_w_push_url.push(repo);
                 }
+            } else {
+                for (const repo of repos) {
+                    const n_repo = await this.bitbucketService.createRepo(repo.name);
+                    repo.push_url = n_repo.clone_url;
+                    repos_w_push_url.push(repo);
+                }
             }
 
-            spinner.text = 'Repositories Created Successfully\n';
+            spinner.text = `Repositories Created Successfully in ${service}\n`;
             spinner.succeed();
 
             return repos_w_push_url;

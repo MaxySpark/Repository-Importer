@@ -89,7 +89,7 @@ export class GithubService {
                                                     private: body.private,
                                                     html_url: body.html_url,
                                                     clone_url: body.clone_url
-                                                }
+                                                };
 
         return new_repo;
     }

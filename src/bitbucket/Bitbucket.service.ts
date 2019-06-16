@@ -47,6 +47,61 @@ export class BitbucketService {
 
         const response: IRepoResponse = { repos: filterRepos, link: link, provider: 'bitbucket'};
         return response;
-    }  
+    }
+
+    public createRepo = async (repo_name: string) => {
+        const baseUrl = 'https://api.bitbucket.org/2.0/repositories/' + AppConfig.BITBUCKET_USERNAME + '/';
+
+        let uri = baseUrl + repo_name.toLowerCase();
+        
+        let options = {
+            simple : false,
+            method: 'POST',
+            uri: uri,
+            auth: {
+                user: AppConfig.BITBUCKET_USERNAME,
+                pass: AppConfig.BITBUCKET_ACCESS_TOKEN
+            },
+            headers: {
+                'User-Agent': 'nodejs'
+            },
+            resolveWithFullResponse: true,
+            body: {
+                name: repo_name,
+                scm: 'git',
+                is_private: true,
+                fork_policy: 'no_public_forks'
+            },
+            json: true
+        };
+        
+        let { body, statusCode } = await rp(options);
+        
+        let count = 1;
+
+
+        while (statusCode === 400) {
+            const suffix = count++;
+            options.uri = `${baseUrl}${repo_name.toLowerCase()}-${suffix}`;
+            options.body.name = `${repo_name}-${suffix}`;
+            const response = await rp(options);
+            statusCode = response.statusCode;
+            body = response.body;
+        }
+
+        const new_repo: IRepoFilterProperties = {
+                                                    id: body.uuid,
+                                                    name: body.name,
+                                                    owner: {
+                                                        login: body.owner.type === 'user' ? body.owner.nickname : body.owner.username,
+                                                        type: body.owner.type
+                                                    },
+                                                    private: body.is_private,
+                                                    html_url: body.links.html.href,
+                                                    clone_url: body.links.clone[0].href
+                                                };
+
+        return new_repo;
+    }
 
 }

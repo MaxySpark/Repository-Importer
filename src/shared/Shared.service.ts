@@ -103,8 +103,12 @@ export class SharedService {
 
         shell.rm('-rf', '*');
         bar.stop();
-        spinner.text = 'Repositories Pushed Successfully\n';
+        spinner.text = 'Repositories Imported Successfully\n';
         spinner.succeed();
+        console.log('Imported Repository List: \n');
+        modify_repos.forEach((repo) => {
+            console.log(`* ${repo.owner.login} : ${repo.name}\n`);
+        })
     }
 
     
