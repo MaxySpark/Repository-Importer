@@ -7,7 +7,7 @@ import { AppConfig } from '../config/App.config';
 
 export class SharedService {
 
-    private modifyRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+    private modifyCloneRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
 
         const githubPrefix = `https://${AppConfig.GITHUB_ACCESS_TOKEN}@github.com/`;
         const bitbucketPrefix = `https://${AppConfig.BITBUCKET_USERNAME}:${AppConfig.BITBUCKET_ACCESS_TOKEN}@bitbucket.org/`;
@@ -29,9 +29,31 @@ export class SharedService {
         }
     }
 
+    private modifyPushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+
+        const githubPrefix = `https://${AppConfig.GITHUB_ACCESS_TOKEN}@github.com/`;
+        const bitbucketPrefix = `https://${AppConfig.BITBUCKET_USERNAME}:${AppConfig.BITBUCKET_ACCESS_TOKEN}@bitbucket.org/`;
+
+        if (provider === 'github') {
+            return repos.map((repo: IRepoFilterProperties) => {
+                                        return {
+                                            ...repo,
+                                            push_url: githubPrefix + repo.push_url.split('/').slice(3).join('/')
+                                        }    
+                                    });
+        } else {
+            return repos.map((repo: IRepoFilterProperties) => {
+                                        return {
+                                                ...repo,
+                                                push_url: bitbucketPrefix + repo.push_url.split('/').slice(3).join('/')
+                                            }    
+                                        });
+        }
+    }
+
     public cloneRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
 
-        const modify_repos = await this.modifyRepos(provider, repos);
+        const modify_repos = await this.modifyCloneRepos(provider, repos);
 
         if (!fs.existsSync(__dirname + '/../../git')) {
             fs.mkdirSync(__dirname + '/../../git/');
@@ -59,8 +81,8 @@ export class SharedService {
     }
 
     public pushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
-        const modify_repos = await this.modifyRepos(provider, repos);
-
+        const modify_repos = await this.modifyPushRepos(provider, repos);
+        
         shell.cd(__dirname + '/../../git');
 
         const spinner = ora({
@@ -75,6 +97,7 @@ export class SharedService {
             shell.cd(`${repo.id}`);
             shell.exec(`git push --mirror ${repo.push_url}`, { silent: true });
             bar.update(++count);
+            shell.cd('..');
         });
 
         bar.stop();

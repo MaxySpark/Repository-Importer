@@ -5,8 +5,6 @@ import { SharedService } from './shared/Shared.service';
 (async () => {
     try {
         const app = new App();
-        const sharedService = new SharedService();
-        
         const provider = await app.selectProvider();
 
         if (!provider) {
@@ -18,10 +16,9 @@ import { SharedService } from './shared/Shared.service';
         let selectedRepos = await app.selectRepos(repositoryObject.repos);
 
         if (selectedRepos && selectedRepos.length !== 0) {
-            await sharedService.cloneRepos(provider, selectedRepos);
-
-            const repo_w_push = await app.getPushRepos(provider, selectedRepos);
-            console.log(repo_w_push);
+            await app.cloneRepos(provider, selectedRepos);
+            const repo_w_push = await app.getPushRepoUrls(provider, selectedRepos);
+            await app.pushRepos(provider, repo_w_push);
         }
         
         let repeat = true;
@@ -37,7 +34,9 @@ import { SharedService } from './shared/Shared.service';
                     selectedRepos = await app.selectRepos(repositoryObject.repos);
     
                     if (selectedRepos && selectedRepos.length !== 0) {
-                        await sharedService.cloneRepos(provider, selectedRepos);
+                        await app.cloneRepos(provider, selectedRepos);
+                        const repo_w_push = await app.getPushRepoUrls(provider, selectedRepos);
+                        await app.pushRepos(provider, repo_w_push);
                     }
                 }
             } else {

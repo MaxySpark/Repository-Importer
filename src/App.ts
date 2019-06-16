@@ -4,13 +4,14 @@ import * as _ from 'lodash';
 
 import { GithubService } from './github/Github.service';
 import { BitbucketService } from './bitbucket/Bitbucket.service';
-import { IRepoResponse, IRepoFilterProperties, IUser } from './interface';
-import { AppConfig } from './config/App.config';
+import { IRepoResponse, IRepoFilterProperties } from './interface';
+import { SharedService } from './shared/Shared.service';
 
 export class App {
     private githubService = new GithubService();
     private bitbucketService = new BitbucketService();
-
+    private sharedService = new SharedService();
+    
     public selectProvider = async () => {
         const provider = await prompts({
             type: 'select',
@@ -122,23 +123,47 @@ export class App {
         return repeat.value ? repeat.value : false;
     }
 
-    public getPushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+    public getPushRepoUrls = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
         try {
+            const spinner = ora({
+                text: `Creating Repositories\n`,
+            }).start();
             const repos_w_push_url: IRepoFilterProperties[] = [];
-
-            if (provider === 'github') {
+            const push_provider = this.getPushProvider(provider);
+            if (push_provider === 'github') {
                 for (const repo of repos) {
                     const n_repo = await this.githubService.createRepo(repo.name);
                     repo.push_url = n_repo.clone_url;
                     repos_w_push_url.push(repo);
                 }
             }
-            
+
+            spinner.text = 'Repositories Created Successfully\n';
+            spinner.succeed();
+
             return repos_w_push_url;
         } catch(e) {
             console.log(e);
         }
         
+    }
+
+    public getPushProvider = (provider: 'github' | 'bitbucket') => {
+        if (provider === 'github') {
+            return 'bitbucket';
+        } else {
+            return 'github';
+        }
+    }
+
+    public cloneRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+        await this.sharedService.cloneRepos(provider, repos);
+    }
+
+    public pushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+        const push_provider = this.getPushProvider(provider);
+
+        await this.sharedService.pushRepos(push_provider, repos);
     }
 
 }
