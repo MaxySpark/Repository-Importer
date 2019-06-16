@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { App } from "./App";
-import { SharedService } from './shared/Shared.service';
 
 (async () => {
     try {

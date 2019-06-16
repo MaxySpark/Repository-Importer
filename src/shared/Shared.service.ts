@@ -2,7 +2,7 @@ import * as shell from 'shelljs';
 import * as fs from 'fs';
 import * as ora from 'ora';
 import * as progress from 'cli-progress';
-import { IUser, IRepoFilterProperties } from '../interface';
+import { IRepoFilterProperties } from '../interface';
 import { AppConfig } from '../config/App.config';
 
 export class SharedService {
@@ -60,6 +60,7 @@ export class SharedService {
         }
         
         shell.cd(__dirname + '/../../git');
+        shell.rm('-rf', '*');
 
         const spinner = ora({
             text: `Cloning Repositories\n`,
@@ -100,6 +101,7 @@ export class SharedService {
             shell.cd('..');
         });
 
+        shell.rm('-rf', '*');
         bar.stop();
         spinner.text = 'Repositories Pushed Successfully\n';
         spinner.succeed();
