@@ -22,9 +22,9 @@ export class GithubService {
             json: true
         };
         
-        const { headers, body } = await rp(options);
+        const { headers, body, statusCode } = await rp(options);
         
-        if (headers.status === 401 || headers.status === 403 || headers.status === 404) {
+        if (statusCode === 401 || statusCode === 403 || statusCode === 404) {
             throw new Error(body.message);
         }
         
@@ -52,6 +52,8 @@ export class GithubService {
 
     public createRepo = async (repo_name: string) => {
         let options = {
+            simple : false,
+            method: 'POST',
             uri: this.baseUrl,
             headers: {
                 'Authorization': 'token ' + AppConfig.GITHUB_ACCESS_TOKEN,
@@ -65,19 +67,16 @@ export class GithubService {
             json: true
         };
         
-        let { headers, body } = await rp(options);
-
-        if (headers.status === 401 || headers.status === 403 || headers.status === 404) {
-            throw new Error(body.message);
-        }
+        let { body, statusCode } = await rp(options);
+        
         let count = 1;
-        let status = headers.status;
 
-        while (status === 422) {
+
+        while (statusCode === 422) {
             options.body.name = `${repo_name}-${count++}`;
-            const { re_headers, re_body } = await rp(options);
-            status = re_headers.status;
-            body = re_body;
+            const response = await rp(options);
+            statusCode = response.statusCode;
+            body = response.body;
         }
 
         const new_repo: IRepoFilterProperties = {

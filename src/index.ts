@@ -19,6 +19,9 @@ import { SharedService } from './shared/Shared.service';
 
         if (selectedRepos && selectedRepos.length !== 0) {
             await sharedService.cloneRepos(provider, selectedRepos);
+
+            const repo_w_push = await app.getPushRepos(provider, selectedRepos);
+            console.log(repo_w_push);
         }
         
         let repeat = true;

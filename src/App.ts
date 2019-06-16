@@ -67,7 +67,7 @@ export class App {
         const filterRepo = _.filter(repos, (repo) => {
             return typeof keys[repo.id] !== 'undefined';
         })
-        
+
         return filterRepo;
     }
 
@@ -120,6 +120,25 @@ export class App {
         });
 
         return repeat.value ? repeat.value : false;
+    }
+
+    public getPushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+        try {
+            const repos_w_push_url: IRepoFilterProperties[] = [];
+
+            if (provider === 'github') {
+                for (const repo of repos) {
+                    const n_repo = await this.githubService.createRepo(repo.name);
+                    repo.push_url = n_repo.clone_url;
+                    repos_w_push_url.push(repo);
+                }
+            }
+            
+            return repos_w_push_url;
+        } catch(e) {
+            console.log(e);
+        }
+        
     }
 
 }
