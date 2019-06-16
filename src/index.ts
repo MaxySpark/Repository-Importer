@@ -15,7 +15,7 @@ import { SharedService } from './shared/Shared.service';
 
         let repositoryObject = await app.getRepos(provider);
         
-        let selectedRepos: string[] = await app.selectRepos(repositoryObject.repos);
+        let selectedRepos = await app.selectRepos(repositoryObject.repos);
 
         if (selectedRepos && selectedRepos.length !== 0) {
             await sharedService.cloneRepos(provider, selectedRepos);

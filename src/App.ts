@@ -1,5 +1,6 @@
 import * as prompts from 'prompts';
 import * as ora from 'ora';
+import * as _ from 'lodash';
 
 import { GithubService } from './github/Github.service';
 import { BitbucketService } from './bitbucket/Bitbucket.service';
@@ -58,11 +59,16 @@ export class App {
             type: 'autocompleteMultiselect',
             name: 'value',
             message: 'Pick Repos',
-            choices: repos.map(repo => { return { title: `${repo.owner.login} : ${repo.name}${repo.private ? ' (Private)' : ''}`, value: repo.clone_url }; }),
+            choices: repos.map(repo => { return { title: `${repo.owner.login} : ${repo.name}${repo.private ? ' (Private)' : ''}`, value: repo.id.toString() }; }),
             hint: '- Space to select. Return to submit'
         });
 
-        return selectedRepos.value;
+        const keys = _.keyBy(selectedRepos.value);
+        const filterRepo = _.filter(repos, (repo) => {
+            return typeof keys[repo.id] !== 'undefined';
+        })
+        
+        return filterRepo;
     }
 
     public fetchMoreRepos = async (provider: 'github' | 'bitbucket', data: IRepoResponse) => {

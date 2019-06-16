@@ -30,7 +30,8 @@ export class BitbucketService {
         const link: IPagination = body.next ? { next : { url : body.next, rel: 'next', page: '' } } : {};
 
         const filterRepos: IRepoFilterProperties[] = body.values.map((repo: any )=> {
-                                                                return {
+                                                                const m_repo: IRepoFilterProperties = {
+                                                                    id: repo.uuid,
                                                                     name: repo.name,
                                                                     owner: {
                                                                         login: repo.owner.type === 'user' ? repo.owner.nickname : repo.owner.username,
@@ -39,7 +40,9 @@ export class BitbucketService {
                                                                     private: repo.is_private,
                                                                     html_url: repo.links.html.href,
                                                                     clone_url: repo.links.clone[0].href
-                                                                }
+                                                                };
+
+                                                                return  m_repo;
                                                             });
 
         const response: IRepoResponse = { repos: filterRepos, link: link, provider: 'bitbucket'};

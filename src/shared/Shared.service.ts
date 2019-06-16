@@ -2,24 +2,34 @@ import * as shell from 'shelljs';
 import * as fs from 'fs';
 import * as ora from 'ora';
 import * as progress from 'cli-progress';
-import { IUser } from '../interface';
+import { IUser, IRepoFilterProperties } from '../interface';
 import { AppConfig } from '../config/App.config';
 
 export class SharedService {
 
-    private modifyRepos = async (provider: 'github' | 'bitbucket', repos: string[]) => {
+    private modifyRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
 
         const githubPrefix = `https://${AppConfig.GITHUB_ACCESS_TOKEN}@github.com/`;
         const bitbucketPrefix = `https://${AppConfig.BITBUCKET_USERNAME}:${AppConfig.BITBUCKET_ACCESS_TOKEN}@bitbucket.org/`;
 
         if (provider === 'github') {
-            return repos.map(repo => githubPrefix + repo.split('/').slice(3).join('/'));
+            return repos.map((repo: IRepoFilterProperties) => {
+                                        return {
+                                            ...repo,
+                                            clone_url: githubPrefix + repo.clone_url.split('/').slice(3).join('/')
+                                        }    
+                                    });
         } else {
-            return repos.map(repo => bitbucketPrefix + repo.split('/').slice(3).join('/'));
+            return repos.map((repo: IRepoFilterProperties) => {
+                                        return {
+                                                ...repo,
+                                                clone_url: bitbucketPrefix + repo.clone_url.split('/').slice(3).join('/')
+                                            }    
+                                        });
         }
     }
 
-    public cloneRepos = async (provider: 'github' | 'bitbucket', repos: string[]) => {
+    public cloneRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
 
         const modify_repos = await this.modifyRepos(provider, repos);
 
@@ -38,7 +48,7 @@ export class SharedService {
         bar.start(repos.length, count);
         
         modify_repos.forEach( async (repo) => {
-            shell.exec(`git clone ${repo}`, { silent: true });
+            shell.exec(`git clone --bare ${repo.clone_url} ${repo.id}`, { silent: true });
             bar.update(++count);
         });
 
@@ -46,6 +56,30 @@ export class SharedService {
         spinner.text = 'Repositories Cloned Successfully\n';
         spinner.succeed();
         
+    }
+
+    public pushRepos = async (provider: 'github' | 'bitbucket', repos: IRepoFilterProperties[]) => {
+        const modify_repos = await this.modifyRepos(provider, repos);
+
+        shell.cd(__dirname + '/../../git');
+
+        const spinner = ora({
+            text: `Pushing Repositories\n`,
+        }).start();
+
+        const bar = new progress.Bar({}, progress.Presets.shades_classic);
+        let count = 0;
+        bar.start(repos.length, count);
+        
+        modify_repos.forEach( async (repo) => {
+            shell.cd(`${repo.id}`);
+            shell.exec(`git push --mirror ${repo.push_url}`, { silent: true });
+            bar.update(++count);
+        });
+
+        bar.stop();
+        spinner.text = 'Repositories Pushed Successfully\n';
+        spinner.succeed();
     }
 
     

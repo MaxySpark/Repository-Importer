@@ -1,4 +1,5 @@
 export interface IRepoFilterProperties {
+    id: string | number;
     name: string;
     owner: {
         login: string;
@@ -7,6 +8,7 @@ export interface IRepoFilterProperties {
     private: boolean;
     html_url: string;
     clone_url: string;
+    push_url?: string;
 }
 
 export interface IPagination {
