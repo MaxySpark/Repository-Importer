@@ -86,6 +86,10 @@ export class App {
             initial: 0
         });
 
+        if (!link.value) {
+            return;
+        }
+
         const spinner = ora({
             text: 'Fetching Repositories\n',
         }).start();

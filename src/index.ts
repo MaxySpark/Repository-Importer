@@ -29,7 +29,11 @@ import { App } from "./App";
             
                 if (repeat) {
                     repositoryObject = await app.fetchMoreRepos(provider, repositoryObject);
-    
+                    
+                    if (!repositoryObject) {
+                        return;
+                    }
+
                     selectedRepos = await app.selectRepos(repositoryObject.repos);
     
                     if (selectedRepos && selectedRepos.length !== 0) {
