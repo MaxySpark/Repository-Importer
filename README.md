@@ -1,5 +1,5 @@
 # Repository-Importer
-#### Import Repository From Github to Bitbucket and Bitbucket to Github
+#### Import Repository From Github to Bitbucket and Bitbucket to Github (Repository will be Imported as Private)
 
 ## Prerequisite
  * [x] NodeJS and NPM
