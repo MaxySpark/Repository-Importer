@@ -73,7 +73,7 @@
      
   
 ## Todo
-   * [] Fetch Repo From Next Pages While Typing/Searching
+   * [ ] Fetch Repo From Next Pages While Typing/Searching
 
 ## Contribute
   - **PRs are Welcome :blush:**
