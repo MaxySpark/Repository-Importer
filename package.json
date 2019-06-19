@@ -31,7 +31,7 @@
     "@types/lodash": "^4.14.134",
     "@types/node": "^12.0.8",
     "@types/parse-link-header": "^1.0.0",
-    "@types/prompts": "^2.0.0",
+    "@types/prompts": "^2.0.1",
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.44",
     "@types/shelljs": "^0.8.5",
